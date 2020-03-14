@@ -1,4 +1,4 @@
-package hll
+package pds
 
 import (
 	"crypto/md5"
@@ -16,8 +16,8 @@ type HyperLogLog struct {
 	substreams [M]int32
 }
 
-// New creates a new HyperLogLog
-func New() HyperLogLog {
+// NewHyperLogLog creates a new HyperLogLog
+func NewHyperLogLog() HyperLogLog {
 	return HyperLogLog{
 		substreams: [M]int32{0},
 	}

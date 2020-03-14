@@ -1,4 +1,4 @@
-package hll
+package pds
 
 import (
 	"sync"
@@ -25,11 +25,11 @@ func TestHyperLogLog(t *testing.T) {
 		{0, 10000, 0.1, 10000},
 		{2, 10000, 0.1, 10000},
 		{5, 250000, 0.1, 250000},
-		{0, 7777777, 0.1, 7777777},
+		{0, 777777, 0.1, 777777},
 	}
 
 	for _, tc := range testCases {
-		hll := New()
+		hll := NewHyperLogLog()
 
 		for i := 0; i <= tc.dupe; i++ {
 			for i := uint64(0); i < tc.uniq; i++ {
@@ -38,7 +38,7 @@ func TestHyperLogLog(t *testing.T) {
 		}
 
 		expected, actual := tc.want, hll.Cardinality()
-		err := 1 - (float64(actual) / float64(expected))
+		err := (float64(actual) - float64(expected)) / float64(expected)
 		if err > tc.err {
 			t.Errorf("hll.Cardinality() = %v; want %v with an err of %v; got %v", actual, expected, tc.err, err)
 		}
@@ -46,14 +46,14 @@ func TestHyperLogLog(t *testing.T) {
 }
 
 func TestHyperLogLogConcurrent(t *testing.T) {
-	hll := New()
+	hll := NewHyperLogLog()
 
 	var wg sync.WaitGroup
 	for i := 0; i <= 15; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for i := uint64(0); i < 7777777; i++ {
+			for i := uint64(0); i < 777777; i++ {
 				hll.Insert(i)
 			}
 		}()
@@ -61,8 +61,8 @@ func TestHyperLogLogConcurrent(t *testing.T) {
 
 	wg.Wait()
 
-	expected, actual := 7777777, hll.Cardinality()
-	err := 1 - (float64(actual) / float64(expected))
+	expected, actual := 777777, hll.Cardinality()
+	err := (float64(actual) - float64(expected)) / float64(expected)
 	if err > 0.1 {
 		t.Errorf("hll.Cardinality() = %v; want %v with an err of %v; got %v", actual, expected, 0.1, err)
 	}
